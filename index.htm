@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RSVP Speedreader</title>
+  <title>WordStream</title>
+
   <style>
     :root{
-      /* theme tokens (default: light, can be overridden by prefers-color-scheme or data-theme) */
+      /* theme tokens (default: light; overridden by prefers-color-scheme or data-theme) */
       --bg: oklch(0.98 0.01 250);
       --panel: oklch(0.99 0.01 250);
       --panel2: oklch(0.95 0.02 250);
@@ -17,7 +18,7 @@
 
       --radius: 1rem;
 
-      --accent: #d12b2b; /* ORP pivot */
+      --accent: #d12b2b; /* ORP pivot + brand red */
       --focus: oklch(0.72 0.12 255);
 
       --cta: color-mix(in oklab, var(--focus) 78%, white 22%);
@@ -133,13 +134,38 @@
 
     .brand{
       display:flex;
-      align-items:baseline;
+      align-items:center;
       gap: 0.75rem;
       min-width: 14ch;
     }
-    .brand .title{
-      font-weight: 850;
-      letter-spacing: 0.0125rem;
+    .logo{
+      width: 2.6rem;
+      height: auto;
+      flex: 0 0 auto;
+      color: color-mix(in oklab, var(--text) 78%, transparent);
+    }
+
+    .brand h1{
+      margin: 0;
+      font: 900 clamp(1.1rem, 2.2vw, 1.45rem)/1.1 var(--sans);
+      letter-spacing: 0.02em;
+    }
+    .brand h1 .mark{
+      background:
+        linear-gradient(
+          to bottom,
+          transparent 62%,
+          color-mix(in oklab, var(--focus) 22%, transparent) 62%,
+          color-mix(in oklab, var(--focus) 22%, transparent) 100%
+        );
+      padding: 0 0.08em;
+      border-radius: 0.35em;
+    }
+    .brand h1 .sub{
+      font: 800 0.8rem/1.2 var(--mono);
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      margin-left: 0.55em;
     }
 
     .header-actions{
@@ -230,7 +256,77 @@
     #btnTheme.is-dark .icon-sun{ display:none; }
     #btnTheme.is-dark .icon-moon{ display:block; }
 
-    /* ---- Text bar ---- */
+    /* ---- Reader ---- */
+    .redicle{
+      width: 100%;
+      height: var(--reader-h);
+      border-radius: clamp(1.125rem, 2vw, 1.375rem);
+      border: 0.0625rem solid var(--border);
+      background: color-mix(in oklab, var(--panel) 92%, transparent);
+      box-shadow: var(--shadow);
+      display:grid;
+      place-items:center;
+      position:relative;
+      overflow:hidden;
+      user-select:none;
+    }
+    .redicle::before,
+    .redicle::after{
+      content:"";
+      position:absolute;
+      left: 0;
+      right: 0;
+      height: var(--line);
+      background: color-mix(in oklab, var(--text) 18%, transparent);
+      opacity: .85;
+    }
+    .redicle::before{ top: 38%; }
+    .redicle::after{ bottom: 38%; }
+
+    .pivot{ position:absolute; inset: 0; pointer-events:none; }
+    .pivot::after{
+      content:"";
+      position:absolute;
+      top: 50%;
+      left: 50%;
+      width: 0.75rem;
+      height: 0.75rem;
+      transform: translate(-50%, -50%);
+      border-radius: 999rem;
+      border: 0.125rem solid color-mix(in oklab, var(--text) 20%, transparent);
+      background: color-mix(in oklab, var(--panel) 80%, transparent);
+      opacity: .45;
+    }
+
+    .word{
+      display:grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items:baseline;
+      font-family: var(--mono);
+      font-size: var(--reader-font-size);
+      line-height: 1;
+      letter-spacing: 0.03125rem;
+      width: 100%;
+      padding: 0 clamp(0.75rem, 3vw, 1.625rem);
+      filter: drop-shadow(0 0.625rem 1.125rem rgba(0,0,0,.10));
+    }
+    html[data-theme="dark"] .word{
+      filter: drop-shadow(0 0.75rem 1.3rem rgba(0,0,0,.25));
+    }
+
+    .left{ text-align:right; opacity:.96; }
+    .orp{ color: var(--accent); font-weight: 900; padding: 0 0.04em; }
+    .right{ text-align:left; opacity:.96; }
+
+    .placeholder{
+      color: var(--muted);
+      font-size: clamp(1rem, 2.4vw, 1.25rem);
+      padding: 1.25rem;
+      text-align:center;
+      max-width: 65ch;
+    }
+
+    /* ---- Text bar (Load button) ---- */
     .textbar{
       display:grid;
       gap: 0.5rem;
@@ -331,6 +427,7 @@
       display:flex;
       justify-content:flex-end;
       align-items:center;
+      gap: 0.5rem;
     }
     .panel-actions .load{
       width: auto;
@@ -338,76 +435,6 @@
       padding: 0.8rem 0.875rem;
       border-radius: 0.95rem;
       font-size: 0.95rem;
-    }
-
-    /* ---- Reader ---- */
-    .redicle{
-      width: 100%;
-      height: var(--reader-h);
-      border-radius: clamp(1.125rem, 2vw, 1.375rem);
-      border: 0.0625rem solid var(--border);
-      background: color-mix(in oklab, var(--panel) 92%, transparent);
-      box-shadow: var(--shadow);
-      display:grid;
-      place-items:center;
-      position:relative;
-      overflow:hidden;
-      user-select:none;
-    }
-    .redicle::before,
-    .redicle::after{
-      content:"";
-      position:absolute;
-      left: 0;
-      right: 0;
-      height: var(--line);
-      background: color-mix(in oklab, var(--text) 18%, transparent);
-      opacity: .85;
-    }
-    .redicle::before{ top: 38%; }
-    .redicle::after{ bottom: 38%; }
-
-    .pivot{ position:absolute; inset: 0; pointer-events:none; }
-    .pivot::after{
-      content:"";
-      position:absolute;
-      top: 50%;
-      left: 50%;
-      width: 0.75rem;
-      height: 0.75rem;
-      transform: translate(-50%, -50%);
-      border-radius: 999rem;
-      border: 0.125rem solid color-mix(in oklab, var(--text) 20%, transparent);
-      background: color-mix(in oklab, var(--panel) 80%, transparent);
-      opacity: .45;
-    }
-
-    .word{
-      display:grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items:baseline;
-      font-family: var(--mono);
-      font-size: var(--reader-font-size);
-      line-height: 1;
-      letter-spacing: 0.03125rem;
-      width: 100%;
-      padding: 0 clamp(0.75rem, 3vw, 1.625rem);
-      filter: drop-shadow(0 0.625rem 1.125rem rgba(0,0,0,.10));
-    }
-    html[data-theme="dark"] .word{
-      filter: drop-shadow(0 0.75rem 1.3rem rgba(0,0,0,.25));
-    }
-
-    .left{ text-align:right; opacity:.96; }
-    .orp{ color: var(--accent); font-weight: 900; padding: 0 0.04em; }
-    .right{ text-align:left; opacity:.96; }
-
-    .placeholder{
-      color: var(--muted);
-      font-size: clamp(1rem, 2.4vw, 1.25rem);
-      padding: 1.25rem;
-      text-align:center;
-      max-width: 65ch;
     }
 
     /* ---- Controls ---- */
@@ -684,10 +711,6 @@
       display:grid;
       gap: 0.5rem;
     }
-    .help-note{
-      margin: 0.875rem 0 0;
-      color: var(--muted);
-    }
 
     @media (prefers-reduced-motion: reduce){
       *, *::before, *::after{
@@ -699,18 +722,59 @@
     }
   </style>
 </head>
+
 <body>
   <div class="app" id="appRoot">
 
     <header>
       <div class="brand">
-        <div class="title">RSVP Speedreader</div>
+        <!-- second-to-last SVG (Variant C) -->
+        <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 140" role="img" aria-label="WordStream logo">
+          <title>WordStream</title>
+
+          <g transform="translate(14,10)">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="4" opacity="0.22"/>
+            <circle cx="60" cy="60" r="49" fill="none" stroke="currentColor" stroke-width="2" opacity="0.10"/>
+
+            <text x="60" y="83" text-anchor="middle"
+                  font-family="Georgia, 'Times New Roman', serif"
+                  font-size="78" font-weight="700"
+                  fill="currentColor" opacity="0.62">W</text>
+
+            <g opacity="0.12">
+              <line x1="60" y1="26" x2="60" y2="94" stroke="currentColor" stroke-width="2"/>
+              <line x1="26" y1="60" x2="94" y2="60" stroke="currentColor" stroke-width="2"/>
+              <circle cx="60" cy="60" r="16" fill="none" stroke="currentColor" stroke-width="2"/>
+            </g>
+
+            <circle cx="84" cy="40" r="4.5" fill="#d12b2b" opacity="0.95"/>
+          </g>
+
+          <g transform="translate(160,24)">
+            <g transform="translate(190,46)" opacity="0.16">
+              <line x1="-18" y1="-28" x2="-18" y2="28" stroke="currentColor" stroke-width="2"/>
+              <line x1="-46" y1="0" x2="10" y2="0" stroke="currentColor" stroke-width="2"/>
+              <circle cx="-18" cy="0" r="14" fill="none" stroke="currentColor" stroke-width="2"/>
+            </g>
+
+            <text x="0" y="72"
+                  font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+                  font-size="64" font-weight="900"
+                  fill="currentColor" opacity="0.80" letter-spacing="0.4">
+              Word<tspan fill="#d12b2b" opacity="0.95">S</tspan>tream
+            </text>
+
+            <path d="M196 86 C206 94, 220 94, 230 86"
+                  fill="none" stroke="#d12b2b" stroke-width="4" stroke-linecap="round" opacity="0.35"/>
+          </g>
+        </svg>
+
+        <h1><span class="mark">WordStream</span> <span class="sub">RSVP</span></h1>
       </div>
 
       <div class="header-actions">
         <button class="ghost icon-only" id="btnTheme" type="button" aria-pressed="false" title="Theme">
           <span class="theme-icon" aria-hidden="true">
-            <!-- Sun -->
             <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="4"></circle>
               <path d="M12 2v2"></path>
@@ -722,7 +786,7 @@
               <path d="M4.93 19.07l1.41-1.41"></path>
               <path d="M17.66 6.34l1.41-1.41"></path>
             </svg>
-            <!-- Moon -->
+
             <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
@@ -790,6 +854,7 @@
 
     <div class="container">
 
+      <!-- Load button above the reader -->
       <div class="textbar">
         <button id="btnText" class="primary toggle text-toggle" type="button" aria-expanded="false" aria-controls="textPanel">
           <span class="label">
@@ -823,6 +888,7 @@
         </div>
       </div>
 
+      <!-- Reader -->
       <div class="redicle" id="redicle" aria-live="off" aria-label="RSVP reader">
         <div class="pivot" aria-hidden="true"></div>
 
@@ -837,6 +903,7 @@
         </div>
       </div>
 
+      <!-- Controls -->
       <div class="controls" aria-label="Controls">
         <div class="controls-top">
           <div class="player" aria-label="Player">
@@ -878,6 +945,7 @@
         </div>
       </div>
 
+      <!-- Help overlay -->
       <div class="overlay" id="helpOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="helpTitle">
         <div class="overlay-card" role="document">
           <div class="overlay-head">
@@ -888,10 +956,11 @@
             <ul class="help-list">
               <li><strong>Space</strong> — Play / Pause</li>
               <li><strong>S</strong> — Stop</li>
-              <li><strong>T</strong> — Toggle Text panel</li>
+              <li><strong>T</strong> — Toggle text panel</li>
               <li><strong>+</strong> / <strong>-</strong> or <strong>↑</strong> / <strong>↓</strong> — Faster / Slower</li>
               <li><strong>←</strong> / <strong>→</strong> — Back / Forward 10 words</li>
               <li><strong>H</strong> — Toggle help</li>
+              <li><strong>D</strong> — Toggle theme</li>
               <li><strong>Esc</strong> — Close help / close menu / close text panel</li>
               <li><strong>Progress bar</strong> — click or drag, paragraph markers are clickable</li>
             </ul>
@@ -903,11 +972,19 @@
   </div>
 
   <script>
-    class RsvpSpeedreader {
+    class WordStream {
       constructor() {
-        this.settings_key = 'rsvp_speedreader_settings_v11';
-        this.session_key  = 'rsvp_speedreader_session_v11';
-        this.theme_key    = 'rsvp_speedreader_theme_v1';
+        /* Security & reliability limits (hosted scenario). */
+        this.limits = {
+          /* Prevent client-side DoS by extremely large paste/file inputs. */
+          max_chars: 25_000_000,     // ~25M chars (books are usually well below this)
+          max_tokens: 2_500_000,     // caps index arrays to protect memory
+          max_file_bytes: 25 * 1024 * 1024  // 25 MB
+        };
+
+        this.settings_key = 'wordstream_settings_v12';
+        this.session_key  = 'wordstream_session_v12';
+        this.theme_key    = 'wordstream_theme_v1';
 
         this.segmenter = (window.Intl && Intl.Segmenter)
           ? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
@@ -946,6 +1023,7 @@
           last_file_name: '',
 
           is_loading: false,
+          is_truncated: false
         };
 
         this.apply_theme(this.load_theme());
@@ -1088,6 +1166,8 @@
 
             const job_id = msg.job_id;
             const text = String(msg.text || '');
+            const max_tokens = Number(msg.max_tokens || 2500000);
+
             const n = text.length;
 
             let starts = [];
@@ -1097,6 +1177,7 @@
 
             let i = 0;
             let token_count = 0;
+            let truncated = false;
 
             let in_paragraph = false;
             let line_has_nonspace = false;
@@ -1172,6 +1253,11 @@
                 token_count += 1;
               }
 
+              if (token_count >= max_tokens){
+                truncated = true;
+                break;
+              }
+
               if (token_count % 50000 === 0 && i > 0){
                 post_progress(job_id, i / n);
               } else if (i % PROGRESS_STEP === 0){
@@ -1201,6 +1287,7 @@
               {
                 type: 'done',
                 job_id: job_id,
+                truncated: truncated,
                 starts: s32.buffer,
                 ends: e32.buffer,
                 para_starts: ps32.buffer,
@@ -1233,6 +1320,8 @@
         }
 
         if (msg.type === 'done') {
+          this.state.is_truncated = !!msg.truncated || this.state.is_truncated;
+
           this.state.starts = new Uint32Array(msg.starts);
           this.state.ends = new Uint32Array(msg.ends);
           this.state.para_starts = new Uint32Array(msg.para_starts);
@@ -1387,8 +1476,10 @@
         try {
           const loaded = this.has_loaded_text();
           const text = String(this.els.txtInput.value || '');
+
+          /* For hosted use: avoid persisting huge content in localStorage. */
           const store_text_limit = 500000;
-          const stored_text = text.length <= store_text_limit ? text : '';
+          const stored_text = (text.length <= store_text_limit) ? text : '';
 
           localStorage.setItem(this.session_key, JSON.stringify({
             text: stored_text,
@@ -1447,7 +1538,7 @@
         menu.style.position = 'fixed';
         menu.style.inset = 'auto';
 
-        const gap = 10;
+        const gap = 10; /* pixels here are fine (computed geometry) */
         const mw = menu.offsetWidth || 360;
         const mh = menu.offsetHeight || 300;
 
@@ -1503,15 +1594,22 @@
         this.els.textBtnSub.textContent = this.state.loaded_label || '';
       }
 
-      /* ---------- Loading ---------- */
+      /* ---------- Loading (with hosted-safe limits) ---------- */
 
       start_loading_text(text, label) {
-        const t = String(text || '').trim();
+        let t = String(text || '').trim();
         if (!t) return;
 
         this.stop({ silent:true });
 
         this.state.is_loading = true;
+        this.state.is_truncated = false;
+
+        if (t.length > this.limits.max_chars) {
+          t = t.slice(0, this.limits.max_chars);
+          this.state.is_truncated = true;
+        }
+
         this.els.metaMode.textContent = 'Loading';
         this.els.pillState.textContent = 'Loading… 0%';
 
@@ -1527,7 +1625,13 @@
 
         this.parse_job_id += 1;
         const job_id = this.parse_job_id;
-        this.worker.postMessage({ type:'parse', job_id: job_id, text: t });
+
+        this.worker.postMessage({
+          type:'parse',
+          job_id: job_id,
+          text: t,
+          max_tokens: this.limits.max_tokens
+        });
 
         this.update_all_states();
       }
@@ -1535,6 +1639,7 @@
       unload_text() {
         this.stop({ silent:true });
         this.state.is_loading = false;
+        this.state.is_truncated = false;
 
         this.parse_job_id += 1;
 
@@ -1953,8 +2058,7 @@
         const name = String(file.name || '').toLowerCase();
         const type = String(file.type || '').toLowerCase();
 
-        const max_bytes = 50 * 1024 * 1024;
-        if (file.size > max_bytes) return false;
+        if (file.size > this.limits.max_file_bytes) return false;
 
         const allowed_ext = ['.txt', '.md', '.csv', '.log', '.json', '.xml'];
         const has_allowed_ext = allowed_ext.some((ext) => name.endsWith(ext));
@@ -2106,7 +2210,7 @@
           this.els.pillState.textContent = 'No text loaded';
           this.els.metaMode.textContent = 'Ready';
         } else if (loading) {
-          // progress shown elsewhere
+          // progress shown in pill/meta
         } else if (playing) {
           this.els.pillState.textContent = 'Playing';
         } else if (!at_start) {
@@ -2114,6 +2218,8 @@
         } else {
           this.els.pillState.textContent = 'Loaded';
         }
+
+        this.els.metaStatus.textContent = this.state.is_truncated ? 'Truncated' : '';
       }
 
       /* ---------- Load flow ---------- */
@@ -2306,7 +2412,7 @@ Emoji stay intact: 😀 👍🏽 👨‍👩‍👧‍👦`;
       }
     }
 
-    new RsvpSpeedreader();
+    new WordStream();
   </script>
 </body>
 </html>
